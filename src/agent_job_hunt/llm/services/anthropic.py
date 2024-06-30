@@ -1,8 +1,8 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from anthropic import Anthropic
-from anthropic.types import Message
+from anthropic.types import ImageBlockParam, Message, TextBlockParam, MessageParam
 
 from agent_job_hunt.llm.services.models import CLAUDE_THREE_OPUS_MODEL
 
@@ -11,8 +11,8 @@ ANTHROPIC_AI_CLIENT = Anthropic(api_key=ANTHROPIC_API_KEY)
 
 
 def fetch_anthropic_ai_response(
-    prompt: str, images: Optional[List[bytes]] = [], max_tokens: Optional[int] = 1024
-) -> str:
+    prompt: str, images: List[bytes] = [], max_tokens: int = 1024
+) -> Union[str, None]:
     """
     Sends a prompt and optional images to the Anthropic AI API and returns the AI's response.
 
@@ -27,32 +27,39 @@ def fetch_anthropic_ai_response(
     Returns:
         str: The AI's response as a string.
     """
+
+    image_content: List[ImageBlockParam] = [
+        {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": "image/png",
+                "data": image.decode("utf-8"),
+            },
+        }
+        for image in images
+    ]
+    text_content: List[TextBlockParam] = [
+        {
+            "text": prompt,
+            "type": "text",
+        }
+    ]
     return __extract_message_from_anthropic_ai_reponse(
         ANTHROPIC_AI_CLIENT.messages.create(
             model=CLAUDE_THREE_OPUS_MODEL,
             max_tokens=max_tokens,
             messages=[
                 {
-                    "type": "image",
-                    "source": {
-                        "type": "base64",
-                        "media_type": "image/png",
-                        "data": image,
-                    },
-                }
-                for image in images
-            ]
-            + [
-                {
                     "role": "user",
-                    "content": prompt,
+                    "content": image_content + text_content,
                 }
             ],
         )
     )
 
 
-def __extract_message_from_anthropic_ai_reponse(message: Message) -> str:
+def __extract_message_from_anthropic_ai_reponse(message: Message) -> Union[str, None]:
     """
     Extracts and concatenates all text content from a Message object.
 

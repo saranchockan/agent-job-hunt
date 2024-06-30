@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Union
 
 import requests
 
@@ -10,7 +10,7 @@ PERPLEXITY_API_TOKEN = os.environ["PERPLEXITY_API_TOKEN"]
 
 def fetch_perplexity_ai_response(
     user_prompt: str, model: Optional[str] = SONAR_SMALL_ONLINE_MODEL
-) -> str:
+) -> Union[str, None]:
     """
     Fetches a response from the Perplexity AI API based on the given user prompt and model.
 
@@ -40,7 +40,7 @@ def fetch_perplexity_ai_response(
     )
 
 
-def __extract_message_from_perplexity_ai_response(response) -> str:
+def __extract_message_from_perplexity_ai_response(response) -> Union[str, None]:
     """
     Extracts the message content from the Perplexity AI API response.
 

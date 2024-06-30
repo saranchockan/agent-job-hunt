@@ -9,7 +9,7 @@ OPENAI_CLIENT = OpenAI()
 
 
 def fetch_open_ai_response(
-    prompt: str, model: Optional[str] = GPT_FOUR_TURBO_MODEL
+    prompt: str, model: str = GPT_FOUR_TURBO_MODEL
 ) -> Union[str, None]:
     """
     Generate a response from the OpenAI API based on the given prompt.
@@ -40,7 +40,9 @@ def fetch_open_ai_response(
         return None
 
 
-def __extract_message_from_openai_response(response: ChatCompletion) -> str:
+def __extract_message_from_openai_response(
+    response: ChatCompletion,
+) -> Union[str, None]:
     """
     Extract the generated message from the OpenAI API response.
 
